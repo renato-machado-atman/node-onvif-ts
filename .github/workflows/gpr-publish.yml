@@ -1,0 +1,31 @@
+name: GPR Publish
+on:
+  push:
+    branches:
+      - master
+jobs:
+  publish-gpr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://npm.pkg.github.com/
+          scope: '@atmanadmin'
+          
+      - name: cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+
+      - name: install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: build
+        run: npm run build
+        
+      - name: publish
+        run: npm publish
